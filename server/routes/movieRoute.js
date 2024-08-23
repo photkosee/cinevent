@@ -48,12 +48,45 @@ router.post("/:id", authMiddleware, async (req, res) => {
   }
 });
 
-
 // delete a movie by id
 router.delete("/:id", authMiddleware, async (req, res) => {
   try {
     await Movie.findByIdAndDelete(req.params.id);
     res.status(200);
+  } catch (error) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// get all unique theatres which have a show of given movie id
+router.get("/:id/theatres", async (req, res) => {
+  const { date } = req.query;
+
+  try {
+    const shows = await Show.find({ movie: req.params.id, date })
+      .populate("theatre")
+      .sort({ createdAt: -1 });
+      
+    const theatres = shows.reduce((acc, show) => {
+        const theatreExists = acc.some(
+          (theatre) => theatre._id.toString() === show.theatre._id.toString()
+        );
+      
+        if (!theatreExists) {
+          const showsForThisTheatre = shows.filter(
+            (showObj) => showObj.theatre._id.toString() === show.theatre._id.toString()
+          );
+      
+          acc.push({
+            ...show.theatre._doc,
+            shows: showsForThisTheatre,
+          });
+        }
+      
+        return acc;
+      }, []);
+
+    res.status(200).json(theatres);
   } catch (error) {
     res.status(500).json({ error: err.message });
   }
