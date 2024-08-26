@@ -23,7 +23,7 @@ router.get("/", async (req, res) => {
 });
 
 // add a movie
-router.post("/", authMiddleware, async (req, res) => {
+router.post("/", authMiddleware.checkAdmin, async (req, res) => {
   const { title, description, duration, genre, image } = req.body;
   if (!title || !description || !duration || !genre) {
     return res.status(400).json({ msg: "Please enter all fields" });
@@ -39,7 +39,7 @@ router.post("/", authMiddleware, async (req, res) => {
 });
 
 // update a movie
-router.post("/:id", authMiddleware, async (req, res) => {
+router.post("/:id", authMiddleware.checkAdmin, async (req, res) => {
   try {
     await Movie.findByIdAndUpdate(req.params.id, req.body);
     res.status(200);
@@ -49,7 +49,7 @@ router.post("/:id", authMiddleware, async (req, res) => {
 });
 
 // delete a movie by id
-router.delete("/:id", authMiddleware, async (req, res) => {
+router.delete("/:id", authMiddleware.checkAdmin, async (req, res) => {
   try {
     await Movie.findByIdAndDelete(req.params.id);
     res.status(200);

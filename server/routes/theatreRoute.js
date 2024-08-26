@@ -1,10 +1,10 @@
 const router = require("express").Router();
-const authMiddleware = require("../middlewares/authMiddleware");
 const Theatre = require("../models/theatreModel");
 const Show = require("../models/showModel");
+const authMiddleware = require("../middlewares/authMiddleware");
 
 // create a theatre
-router.post("/", authMiddleware, async (req, res) => {
+router.post("/", authMiddleware.checkAdmin, async (req, res) => {
   const { name, totalSeats } = req.body;
 
   if (!name || !totalSeats) {
@@ -32,12 +32,6 @@ router.get("/", async (req, res) => {
 
 // get a theatre by id
 router.get("/:id", async (req, res) => {
-  const { movie, date } = req.query;
-
-  const shows = await Show.find({ movie, date })
-    .populate("theatre")
-    .sort({ createdAt: -1 });
-
   try {
     const theatre = await Theatre.findById(req.params.id);
     res.status(200).json(theatre);
@@ -47,7 +41,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // update a theatre by id
-router.post("/:id", authMiddleware, async (req, res) => {
+router.post("/:id", authMiddleware.checkAdmin, async (req, res) => {
   try {
     await Theatre.findByIdAndUpdate(
       req.params.id,
@@ -60,7 +54,7 @@ router.post("/:id", authMiddleware, async (req, res) => {
 });
 
 // delete a theatre by id
-router.delete("/:id", authMiddleware, async (req, res) => {
+router.delete("/:id", authMiddleware.checkAdmin, async (req, res) => {
   try {
     await Theatre.findByIdAndDelete(req.params.id);
     res.status(200);

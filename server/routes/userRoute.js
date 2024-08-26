@@ -1,46 +1,40 @@
 const router = require("express").Router();
 const User = require("../models/userModel");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+const Booking = require("../models/bookingModel");
+const authMiddleware = require("../middlewares/authMiddleware");
 
-router.post("/register", async (req, res) => {
-  const { name, email, password } = req.body;
-  if (!name || !email || !password) {
-    return res.status(400).json({ msg: "Please enter all fields" });
-  }
-
+// get user details by user id
+router.get("/", authMiddleware.checkAdmin, async (req, res) => {
   try {
-    const user = await User.findOne({ email });
-    if (user) return res.status(400).json({ msg: "User already exists" });
-
-    // hash password
-    const salt = await bcrypt.genSalt(7);
-    const hash = await bcrypt.hash(password, salt);
-
-    // create new user
-    const newUser = new User({ name, email, password: hash });
-    await newUser.save();
-    res.status(201);
+    const user = await User.findById(req.user.id);
+    res.status(200).json(user);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-router.post("/login", async (req, res) => {
-  const { email, name, password } = req.body;
-  
+// list all bookings by user id
+router.get("/:id/bookings", authMiddleware.authenticateToken, async (req, res) => {
   try {
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ msg: "User does not exist" });
+    const bookings = await Booking.find({ user: req.params.id })
+      .populate("show")
+      .populate({
+        path: "show",
+        populate: {
+          path: "movie",
+          model: "movies",
+        },
+      })
+      .populate("user")
+      .populate({
+        path: "show",
+        populate: {
+          path: "theatre",
+          model: "theatres",
+        },
+      });
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ msg: "Invalid password" });
-
-    const token = jwt.sign({ uid: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
-
-    res.status(200).json({ token: token });
+    res.status(200).json(bookings);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
