@@ -1,3 +1,13 @@
+### Table of Contents
+
+- [What this does?](#what-this-does)
+- [Interface](#interface)
+- [Relational Diagram](#relational-diagram)
+
+## What this does?
+
+This API is designed to manage a movie theater booking system, allowing users to browse movies, view showtimes, book seats, and manage their bookings. It includes authentication for users and admins, enabling secure operations such as adding new movies, creating shows, managing theaters, and processing bookings. The API integrates with Stripe for payment processing and ensures data consistency by updating available seats after each booking. It provides comprehensive endpoints for retrieving information about movies, theaters, shows, and user-specific bookings, supporting a seamless moviegoing experience.
+
 ## Interface
 
 <table>
@@ -460,3 +470,7 @@
     </td>
   </tr>
 </table>
+
+## Relational Diagram
+
+<img src="./relational-diagram.png"  />
