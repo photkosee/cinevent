@@ -3,6 +3,7 @@
 - [What this does?](#what-this-does)
 - [Interface](#interface)
 - [Relational Diagram](#relational-diagram)
+- [Built With](#built-with)
 
 ## What this does?
 
@@ -474,3 +475,8 @@ This API is designed to manage a movie theater booking system, allowing users to
 ## Relational Diagram
 
 <img src="./relational-diagram.png"  />
+
+## Built With
+- Express 4 - Node.js web application framework 
+- Mongoose 8 - ODM (Object Data Modeling) library for MongoDB and Node.js
+- MongoDB - NoSQL database
